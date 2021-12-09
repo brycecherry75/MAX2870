@@ -56,6 +56,8 @@ WriteSweepRegs(*regs): high speed write for registers when used for frequency sw
 
 ReadSweepRegs(*regs): high speed read for registers when used for frequency sweep (*regs is uint32_t and size is as per MAX2870_RegsToWrite
 
+ReadCurrentFreq(*freq): calculation of currently programmed frequency (*freq is uint8_t and size is as per MAX2870_ReadCurrentFrequency_ArraySize)
+
 Please note that you should install the provided BigNumber library in your Arduino library directory.
 
 Under non-precision mode, unusual step frequencies e.g. VCO (RF frequency * divider) = 1500.00353 MHz and PFD = 10 MHz (REFIN / R) should be avoided along with a PFD having decimal place(s) to avoid slow GCD calculations for FRAC/MOD and a subsequent FRAC/MOD range error - step sizes for a 10 MHz PFD which do not have this issue are any multiple of 2500/3125/4000 Hz as per this formula (all frequencies are in Hz):

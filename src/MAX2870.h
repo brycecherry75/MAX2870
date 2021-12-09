@@ -60,6 +60,11 @@
 
 #define MAX2870_RegsToWrite 6UL // for high speed sweep
 
+// ReadCurrentFrequency
+#define MAX2870_DIGITS 10
+#define MAX2870_DECIMAL_PLACES 6
+#define MAX2870_ReadCurrentFrequency_ArraySize (MAX2870_DIGITS + MAX2870_DECIMAL_PLACES + 2) // including decimal point and null terminator
+
 /*!
    @brief MAX2870 chip device driver
 
@@ -115,6 +120,7 @@ class MAX2870
 
     void WriteSweepValues(const uint32_t *regs);
     void ReadSweepValues(uint32_t *regs);
+    void ReadCurrentFrequency(uint8_t *freq);
 
     SPISettings MAX2870_SPI;
 
