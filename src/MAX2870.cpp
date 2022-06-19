@@ -132,7 +132,7 @@ int32_t MAX2870::ReadFrequencyError() {
   return MAX2870_FrequencyError;
 }
 
-void MAX2870::ReadCurrentFrequency(uint8_t *freq)
+void MAX2870::ReadCurrentFrequency(char *freq)
 {
   BigNumber::begin(12);
   char tmpstr[12];

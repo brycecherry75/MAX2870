@@ -120,7 +120,7 @@ class MAX2870
 
     void WriteSweepValues(const uint32_t *regs);
     void ReadSweepValues(uint32_t *regs);
-    void ReadCurrentFrequency(uint8_t *freq);
+    void ReadCurrentFrequency(char *freq);
 
     SPISettings MAX2870_SPI;
 
