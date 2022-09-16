@@ -5,6 +5,7 @@
   Commands:
   REF reference_frequency_in_Hz reference_divider reference_multiplier(UNDIVIDED/DOUBLE/HALF) - Set reference frequency, reference divider and reference doubler/divide by 2
   (FREQ/FREQ_P) frequency_in_Hz power_level(0-4) aux_power_level(0-4) aux_frequency_output(DIVIDED/FUNDAMENTAL) frequency_tolerance_in_Hz calculation_timeout_in_mS - set RF frequency (FREQ_P sets precision mode), power level, auxiliary output frequency mode, frequency tolerance (precision mode only), calculation timeout (precision mode only - 0 to disable)
+  (BURST/BURST_CONT/BURST_SINGLE) on_time_in_uS off time_in_uS count (AUX) - perform a on/off burst on frequency and power level set with FREQ/FREQ_P - count is only used with BURST_CONT - if AUX is used, will burst on the auxiliary output; otherwise, it will burst on the primary output
   SWEEP start_frequency stop_frequency step_in_mS(1-32767) power_level(1-4) aux_power_level(0-4) aux_frequency_output(DIVIDED/FUNDAMENTAL) - sweep RF frequency
   STEP frequency_in_Hz - set channel step
   STATUS - view status of VFO
@@ -278,6 +279,96 @@ void loop() {
           }
         }
       }
+      else if (strcmp(field, "BURST") == 0 || strcmp(field, "BURST_CONT") == 0 || strcmp(field, "BURST_SINGLE") == 0) {
+        bool ContinuousBurst = false;
+        bool SingleBurst = false;
+        unsigned long BurstCount;
+        if (strcmp(field, "BURST_CONT") == 0) {
+          ContinuousBurst = true;
+        }
+        else if (strcmp(field, "BURST_SINGLE") == 0) {
+          SingleBurst = true;
+        }
+        bool AuxOutput = false;
+        getField(field, 1);
+        unsigned long BurstOnTime = atol(field);
+        getField(field, 2);
+        unsigned long BurstOffTime = atol(field);
+        getField(field, 3);
+        if (strcmp(field, "AUX") == 0) {
+          AuxOutput = true;
+        }
+        else if (ContinuousBurst == false && SingleBurst == false) {
+          BurstCount = atol(field);
+          getField(field, 4);
+          if (strcmp(field, "AUX") == 0) {
+            AuxOutput = true;
+          }
+        }
+        unsigned long OnBurstData[MAX2870_RegsToWrite];
+        vfo.ReadSweepValues(OnBurstData);
+        if (AuxOutput == false) {
+          vfo.setPowerLevel(0);
+        }
+        else {
+          vfo.setAuxPowerLevel(0);
+        }
+        unsigned long OffBurstData[MAX2870_RegsToWrite];
+        vfo.ReadSweepValues(OffBurstData);
+        Serial.print(F("Burst "));
+        Serial.print((BurstOnTime / 1000));
+        Serial.print(F("."));
+        Serial.print((BurstOnTime % 1000));
+        Serial.print(F(" mS on, "));
+        Serial.print((BurstOffTime / 1000));
+        Serial.print(F("."));
+        Serial.print((BurstOffTime % 1000));
+        Serial.println(F(" mS off"));
+        if (SingleBurst == true) {
+          vfo.WriteSweepValues(OffBurstData);
+          if (BurstOffTime <= 16383) {
+            delayMicroseconds(BurstOffTime);
+          }
+          else {
+            delay((BurstOffTime / 1000));
+            delayMicroseconds((BurstOffTime % 1000));
+          }
+        }
+        if (ContinuousBurst == false && SingleBurst == false && BurstCount == 0) {
+          ValidField = false;
+        }
+        if (ValidField == true) {
+          FlushSerialBuffer();
+          while (true) {
+            vfo.WriteSweepValues(OnBurstData);
+            if (BurstOnTime <= 16383) {
+              delayMicroseconds(BurstOnTime);
+            }
+            else {
+              delay((BurstOnTime / 1000));
+              delayMicroseconds((BurstOnTime % 1000));
+            }
+            vfo.WriteSweepValues(OffBurstData);
+            if (ContinuousBurst == false && SingleBurst == false) {
+              BurstCount--;
+            }
+            if ((ContinuousBurst == false && BurstCount == 0) || SingleBurst == true || Serial.available() > 0) {
+              for (int i = 0; i < MAX2870_RegsToWrite; i++) {
+                vfo.MAX2870_R[i] = OnBurstData[i];
+              }
+              Serial.println(F("End of burst"));
+              break;
+            }
+            if (BurstOffTime <= 16383) {
+              delayMicroseconds(BurstOffTime);
+            }
+            else {
+              delay((BurstOffTime / 1000));
+              delayMicroseconds((BurstOffTime % 1000));
+            }
+          }
+        }
+      }
       else if (strcmp(field, "SWEEP") == 0) {
         BigNumber::begin(12); // will finish on setf()
         getField(field, 1);
@@ -420,12 +511,14 @@ void loop() {
       }
       else if (strcmp(field, "STATUS") == 0) {
         PrintVFOstatus();
+        SPI.end();
         if (digitalRead(LockPin) == LOW) {
           Serial.println(F("Lock pin LOW"));
         }
         else {
           Serial.println(F("Lock pin HIGH"));
         }
+        SPI.begin();
       }
       else if (strcmp(field, "CE") == 0) {
         getField(field, 1);

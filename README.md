@@ -1,6 +1,16 @@
 # MAX2870
 Arduino Library for the MAX2870 Wideband Frequency Synthesizer chip
 
+v1.0.0 First release
+
+v1.0.1 Double buffering of RF frequency divider implemented by default
+
+v1.1.0 Added current frequency read function
+
+v1.1.1 Corrected issue with conversion in ReadCurrentFreq
+
+v1.1.2 Add setPowerLevel function which can be used for frequency bursts
+
 ## Introduction
 
 This library supports the MAX2870 from Maxim on Arduinos. The chip is a wideband (23.475 MHz to 6 GHz) Phase-Locked Loop (PLL) and Voltage Controlled Oscillator (VCO), covering a very wide range frequency range
@@ -51,6 +61,8 @@ ReadPFDfreq(): returns a double for the PFD value
 setf(*frequency, PowerLevel, AuxPowerLevel, AuxFrequencyDivider, PrecisionFrequency, FrequencyTolerance, CalculationTimeout): set the frequency (in Hz with char string) power level/auxiliary power level (1-4 in 3dBm steps from -5dBm), mode for auxiliary frequency output (MAX2870_AUX_(DIVIDED/FUNDAMENTAL)), true/false for precision frequency mode (step size is ignored if true), frequency tolerance (in Hz with uint32_t) under precision frequency mode (rounded to the nearest integer), calculation timeout (in mS with uint32_t - recommended value is 30000 in most cases, 0 to disable) under precision frequency mode - returns an error or warning code
 
 setrf(frequency, R_divider, ReferenceDivisionType): set the reference frequency and reference divider R and reference frequency division type (MAX2870_REF_(UNDIVIDED/HALF/DOUBLE)) - default is 10 MHz/1/undivided - returns an error code
+
+setPowerLevel/setAuxPowerLevel(PowerLevel): set the power level (0 to disable or 1-4) and write to the MAX2870 in one operation - returns an error code
 
 WriteSweepRegs(*regs): high speed write for registers when used for frequency sweep (*regs is uint32_t and size is as per MAX2870_RegsToWrite
 

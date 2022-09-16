@@ -117,6 +117,8 @@ class MAX2870
     int SetStepFreq(uint32_t value);
     int setf(char *freq, uint8_t PowerLevel, uint8_t AuxPowerLevel, uint8_t AuxFrequencyDivider, bool PrecisionFrequency, uint32_t FrequencyTolerance, uint32_t CalculationTimeout) ; // set freq and power levels and output mode with option for precision frequency setting with tolerance in Hz
     int setrf(uint32_t f, uint16_t r, uint8_t ReferenceDivisionType) ; // set reference freq and reference divider (default is 10 MHz with divide by 1)
+    int setPowerLevel(uint8_t PowerLevel);
+    int setAuxPowerLevel(uint8_t PowerLevel);
 
     void WriteSweepValues(const uint32_t *regs);
     void ReadSweepValues(uint32_t *regs);

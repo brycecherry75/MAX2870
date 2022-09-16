@@ -15,6 +15,8 @@ ReadRDIV2	KEYWORD2
 ReadRefDoubler	KEYWORD2
 ReadPFDfreq	KEYWORD2
 ReadFrequencyError	KEYWORD2
+setPowerLevel	KEYWORD2
+setAuxPowerLevel	KEYWORD2
 ReadSweepValues	KEYWORD2
 WriteSweepValues	KEYWORD2
 MAX2870_AUX_DIVIDED	LITERAL1

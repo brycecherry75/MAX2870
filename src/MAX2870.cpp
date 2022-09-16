@@ -537,3 +537,31 @@ int MAX2870::setrf(uint32_t f, uint16_t r, uint8_t ReferenceDivisionType)
   }
   return MAX2870_ERROR_NONE;
 }
+
+int MAX2870::setPowerLevel(uint8_t PowerLevel) {
+  if (PowerLevel < 0 && PowerLevel > 4) return MAX2870_ERROR_POWER_LEVEL;
+  if (PowerLevel == 0) {
+    MAX2870_R[0x04] = BitFieldManipulation.WriteBF_dword(5, 1, MAX2870_R[0x04], 0);
+  }
+  else {
+    PowerLevel--;
+    MAX2870_R[0x04] = BitFieldManipulation.WriteBF_dword(5, 1, MAX2870_R[0x04], 1);
+    MAX2870_R[0x04] = BitFieldManipulation.WriteBF_dword(3, 2, MAX2870_R[0x04], PowerLevel);
+  }
+  WriteRegs();
+  return MAX2870_ERROR_NONE;
+}
+
+int MAX2870::setAuxPowerLevel(uint8_t PowerLevel) {
+  if (PowerLevel < 0 && PowerLevel > 4) return MAX2870_ERROR_POWER_LEVEL;
+  if (PowerLevel == 0) {
+    MAX2870_R[0x04] = BitFieldManipulation.WriteBF_dword(8, 1, MAX2870_R[0x04], 0);
+  }
+  else {
+    PowerLevel--;
+    MAX2870_R[0x04] = BitFieldManipulation.WriteBF_dword(6, 2, MAX2870_R[0x04], PowerLevel);
+    MAX2870_R[0x04] = BitFieldManipulation.WriteBF_dword(8, 1, MAX2870_R[0x04], 1);
+  }
+  WriteRegs();
+  return MAX2870_ERROR_NONE;
+}
