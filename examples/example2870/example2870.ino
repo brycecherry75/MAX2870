@@ -18,7 +18,8 @@
 
 MAX2870 vfo;
 
-const byte SSpin = 10;
+// use hardware SPI pins for Data and Clock
+const byte SSpin = 10; // LE
 const byte LockPin = 12; // MISO
 const byte CEpin = 9;
 
