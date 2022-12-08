@@ -5,6 +5,7 @@
   Commands:
   REF reference_frequency_in_Hz reference_divider reference_multiplier(UNDIVIDED/DOUBLE/HALF) - Set reference frequency, reference divider and reference doubler/divide by 2
   (FREQ/FREQ_P) frequency_in_Hz power_level(0-4) aux_power_level(0-4) aux_frequency_output(DIVIDED/FUNDAMENTAL) frequency_tolerance_in_Hz calculation_timeout_in_mS - set RF frequency (FREQ_P sets precision mode), power level, auxiliary output frequency mode, frequency tolerance (precision mode only), calculation timeout (precision mode only - 0 to disable)
+  FREQ_DIRECT R_divider INT_value MOD_value FRAC_value RF_DIVIDER_value PRESCALER_value FRACTIONAL_MODE(true/false) - sets RF parameters directly
   (BURST/BURST_CONT/BURST_SINGLE) on_time_in_uS off time_in_uS count (AUX) - perform a on/off burst on frequency and power level set with FREQ/FREQ_P - count is only used with BURST_CONT - if AUX is used, will burst on the auxiliary output; otherwise, it will burst on the primary output
   SWEEP start_frequency stop_frequency step_in_mS(1-32767) power_level(1-4) aux_power_level(0-4) aux_frequency_output(DIVIDED/FUNDAMENTAL) - sweep RF frequency
   STEP frequency_in_Hz - set channel step
@@ -278,6 +279,29 @@ void loop() {
             Serial.println(F(" seconds"));
             PrintVFOstatus();
           }
+        }
+      }
+      else if (strcmp(field, "FREQ_DIRECT") == 0) {
+        getField(field, 1);
+        word R_divider = atoi(field);
+        getField(field, 2);
+        word INT_value = atol(field);
+        getField(field, 3);
+        word MOD_value = atoi(field);
+        getField(field, 4);
+        word FRAC_value = atoi(field);
+        getField(field, 5);
+        word RF_DIVIDER_value = atoi(field);
+        getField(field, 6);
+        if (strcmp(field, "TRUE") == 0 || strcmp(field, "FALSE") == 0) {
+          bool FRACTIONAL_MODE = false;
+          if (strcmp(field, "TRUE") == 0) {
+            FRACTIONAL_MODE = true;
+          }
+          vfo.setfDirect(R_divider, INT_value, MOD_value, FRAC_value, RF_DIVIDER_value, FRACTIONAL_MODE);
+        }
+        else {
+          ValidField = false;
         }
       }
       else if (strcmp(field, "BURST") == 0 || strcmp(field, "BURST_CONT") == 0 || strcmp(field, "BURST_SINGLE") == 0) {

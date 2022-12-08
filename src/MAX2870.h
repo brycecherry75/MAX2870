@@ -116,6 +116,7 @@ class MAX2870
     void init(uint8_t SSpin, uint8_t LockPinNumber, bool Lock_Pin_Used, uint8_t CEpin, bool CE_Pin_Used) ;
     int SetStepFreq(uint32_t value);
     int setf(char *freq, uint8_t PowerLevel, uint8_t AuxPowerLevel, uint8_t AuxFrequencyDivider, bool PrecisionFrequency, uint32_t FrequencyTolerance, uint32_t CalculationTimeout) ; // set freq and power levels and output mode with option for precision frequency setting with tolerance in Hz
+    void setfDirect(uint16_t R_divider, uint16_t INT_value,uint16_t MOD_value,uint16_t FRAC_value, uint8_t RF_DIVIDER_value, bool FRACTIONAL_MODE);
     int setrf(uint32_t f, uint16_t r, uint8_t ReferenceDivisionType) ; // set reference freq and reference divider (default is 10 MHz with divide by 1)
     int setPowerLevel(uint8_t PowerLevel);
     int setAuxPowerLevel(uint8_t PowerLevel);

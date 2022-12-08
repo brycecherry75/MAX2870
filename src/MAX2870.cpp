@@ -433,11 +433,11 @@ int  MAX2870::setf(char *freq, uint8_t PowerLevel, uint8_t AuxPowerLevel, uint8_
     MAX2870_R[0x05] = BitFieldManipulation.WriteBF_dword(24, 1, MAX2870_R[0x05], 1); // integer-n mode
   }
   else {
-    MAX2870_R[0x00] = BitFieldManipulation.WriteBF_dword(31, 1, MAX2870_R[0x00], 0); // integer-n mode
+    MAX2870_R[0x00] = BitFieldManipulation.WriteBF_dword(31, 1, MAX2870_R[0x00], 0); // fractional-n mode
     MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(29, 2, MAX2870_R[0x01], 1); // Charge Pump Linearity
     MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(31, 1, MAX2870_R[0x01], 0); // Charge Pump Output Clamp
     MAX2870_R[0x02] = BitFieldManipulation.WriteBF_dword(8, 1, MAX2870_R[0x02], 0); // Lock Detect Function, frac-n mode
-    MAX2870_R[0x05] = BitFieldManipulation.WriteBF_dword(24, 1, MAX2870_R[0x05], 0); // integer-n mode
+    MAX2870_R[0x05] = BitFieldManipulation.WriteBF_dword(24, 1, MAX2870_R[0x05], 0); // fractional-n mode
   }
   // (0x01, 15, 12, 1) phase
   MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(3, 12, MAX2870_R[0x01], MAX2870_Mod);
@@ -536,6 +536,55 @@ int MAX2870::setrf(uint32_t f, uint16_t r, uint8_t ReferenceDivisionType)
     MAX2870_R[0x02] = BitFieldManipulation.WriteBF_dword(24, 2, MAX2870_R[0x02], 0b00000000);
   }
   return MAX2870_ERROR_NONE;
+}
+
+void MAX2870::setfDirect(uint16_t R_divider, uint16_t INT_value, uint16_t MOD_value, uint16_t FRAC_value, uint8_t RF_DIVIDER_value, bool FRACTIONAL_MODE) {
+  switch (RF_DIVIDER_value) {
+    case 1:
+      RF_DIVIDER_value = 0;
+      break;
+    case 2:
+      RF_DIVIDER_value = 1;
+      break;
+    case 4:
+      RF_DIVIDER_value = 2;
+      break;
+    case 8:
+      RF_DIVIDER_value = 3;
+      break;
+    case 16:
+      RF_DIVIDER_value = 4;
+      break;
+    case 32:
+      RF_DIVIDER_value = 5;
+      break;
+    case 64:
+      RF_DIVIDER_value = 6;
+      break;
+    case 128:
+      RF_DIVIDER_value = 7;
+      break;
+  }
+  MAX2870_R[0x02] = BitFieldManipulation.WriteBF_dword(14, 10, MAX2870_R[0x02], R_divider);
+  MAX2870_R[0x00] = BitFieldManipulation.WriteBF_dword(15, 16, MAX2870_R[0x00], INT_value);
+  MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(3, 12, MAX2870_R[0x01], MOD_value);
+  MAX2870_R[0x00] = BitFieldManipulation.WriteBF_dword(3, 12, MAX2870_R[0x00], FRAC_value);
+  MAX2870_R[0x04] = BitFieldManipulation.WriteBF_dword(20, 3, MAX2870_R[0x04], RF_DIVIDER_value);
+  if (FRACTIONAL_MODE == false) {
+    MAX2870_R[0x00] = BitFieldManipulation.WriteBF_dword(31, 1, MAX2870_R[0x00], 1); // integer-n mode
+    MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(29, 2, MAX2870_R[0x01], 0); // Charge Pump Linearity
+    MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(31, 1, MAX2870_R[0x01], 1); // Charge Pump Output Clamp
+    MAX2870_R[0x02] = BitFieldManipulation.WriteBF_dword(8, 1, MAX2870_R[0x02], 1); // Lock Detect Function, int-n mode
+    MAX2870_R[0x05] = BitFieldManipulation.WriteBF_dword(24, 1, MAX2870_R[0x05], 1); // integer-n mode
+  }
+  else {
+    MAX2870_R[0x00] = BitFieldManipulation.WriteBF_dword(31, 1, MAX2870_R[0x00], 0); // frac-n mode
+    MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(29, 2, MAX2870_R[0x01], 1); // Charge Pump Linearity
+    MAX2870_R[0x01] = BitFieldManipulation.WriteBF_dword(31, 1, MAX2870_R[0x01], 0); // Charge Pump Output Clamp
+    MAX2870_R[0x02] = BitFieldManipulation.WriteBF_dword(8, 1, MAX2870_R[0x02], 0); // Lock Detect Function, frac-n mode
+    MAX2870_R[0x05] = BitFieldManipulation.WriteBF_dword(24, 1, MAX2870_R[0x05], 0); // frac-n mode
+  }
+  WriteRegs();
 }
 
 int MAX2870::setPowerLevel(uint8_t PowerLevel) {

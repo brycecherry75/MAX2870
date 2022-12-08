@@ -4,6 +4,7 @@ init	KEYWORD2
 ReadCurrentFrequency	KEYWORD2
 setf	KEYWORD2
 setrf	KEYWORD2
+setfDirect	KEYWORD2
 ReadR	KEYWORD2
 ReadInt	KEYWORD2
 ReadFraction	KEYWORD2

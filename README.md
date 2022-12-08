@@ -11,6 +11,8 @@ v1.1.1 Corrected issue with conversion in ReadCurrentFreq
 
 v1.1.2 Add setPowerLevel function which can be used for frequency bursts
 
+v1.1.3 Added direct entry of frequency parameters for precalculated frequencies of the highest possible precision
+
 ## Introduction
 
 This library supports the MAX2870 from Maxim on Arduinos. The chip is a wideband (23.475 MHz to 6 GHz) Phase-Locked Loop (PLL) and Voltage Controlled Oscillator (VCO), covering a very wide range frequency range
@@ -62,6 +64,8 @@ setf(*frequency, PowerLevel, AuxPowerLevel, AuxFrequencyDivider, PrecisionFreque
 
 setrf(frequency, R_divider, ReferenceDivisionType): set the reference frequency and reference divider R and reference frequency division type (MAX2870_REF_(UNDIVIDED/HALF/DOUBLE)) - default is 10 MHz/1/undivided - returns an error code
 
+setfDirect(R_divider, INT_value, MOD_value, FRAC_value, RF_DIVIDER_value, FRACTIONAL_MODE): RF divider value is (1/2/4/8/16/32/64) and fractional mode is a true/false bool - these paramaters will not be checked for invalid values
+
 setPowerLevel/setAuxPowerLevel(PowerLevel): set the power level (0 to disable or 1-4) and write to the MAX2870 in one operation - returns an error code
 
 WriteSweepRegs(*regs): high speed write for registers when used for frequency sweep (*regs is uint32_t and size is as per MAX2870_RegsToWrite
@@ -69,6 +73,8 @@ WriteSweepRegs(*regs): high speed write for registers when used for frequency sw
 ReadSweepRegs(*regs): high speed read for registers when used for frequency sweep (*regs is uint32_t and size is as per MAX2870_RegsToWrite
 
 ReadCurrentFreq(*freq): calculation of currently programmed frequency (*freq is uint8_t and size is as per MAX2870_ReadCurrentFrequency_ArraySize)
+
+A Python script (MAX2870pf.py) can be used for calculating the required values for setfDirect for speed.
 
 Please note that you should install the provided BigNumber library in your Arduino library directory.
 
