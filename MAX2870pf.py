@@ -1,5 +1,5 @@
 # MAX2870 advanced precision Frequency calculator by Bryce Cherry
-# Usage: python max2870pf.py --ref reference_frequency_in_Hz -rf rf_frequency_in_Hz
+# Usage: python max2870pf.py --ref reference_frequency_in_Hz_float --rf rf_frequency_in_Hz_float
 
 import argparse
 import math
@@ -10,11 +10,11 @@ ReferenceFrequency = 0 # includes selectable reference multiplier or divider (no
 # MAX2870 limits as per datasheet
 MaximumR = 1023
 MinimumInt = 16 # under integer mode
-MaximumInt = 65535 # under integer mode
+MaximumInt = 65535
 MaximumMod = 4095
-MaximumPFDFrequency = 105000000 # under integer mode
+MaximumPFDFrequency= 105000000 # under integer mode with band selection disabled; 45000000 with band selection enabled
 MinimumPFDFrequency = 125000
-MinimumRFFrequency = 23437500
+MinimumRFFrequency = 23475000
 MaximumRFFrequency = 6000000000
 MinimumReferenceFrequency = 10000000
 MaximumReferenceFrequency = 200000000
@@ -23,7 +23,7 @@ NegativeFrequencyError = False
 MatchAttempted = False
 
 # final results
-FrequencyError = ReferenceFrequency
+FrequencyError = 0
 MatchingR = 1
 MatchingInt = 1
 MatchingMod = 2
@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
     ReferenceFrequency = args.ref
     DesiredFrequency = args.rf
+    FrequencyError = ReferenceFrequency
 
     if ReferenceFrequency >= MinimumReferenceFrequency and ReferenceFrequency <= MaximumReferenceFrequency:
       if DesiredFrequency >= MinimumRFFrequency and DesiredFrequency <= MaximumRFFrequency:
@@ -49,7 +50,7 @@ if __name__ == "__main__":
         MatchingDivider = 2**MatchingDivider_PowerOf2
 
         # try integer mode first
-        for RtoMatch in range (MaximumR):
+        for RtoMatch in range (MaximumR + 1):
           if RtoMatch > 0 and (ReferenceFrequency / RtoMatch) >= MinimumPFDFrequency and (ReferenceFrequency / RtoMatch) <= MaximumPFDFrequency: # do not divide by zero or exceed PFD limits under fractional mode
             IntTemp = (DesiredFrequency / (ReferenceFrequency / RtoMatch))
             if IntTemp >= MinimumInt and IntTemp <= MaximumInt:
@@ -72,21 +73,24 @@ if __name__ == "__main__":
           MinimumInt = 19
           MaximumInt = 4091
           MaximumPFDFrequency = 50000000
-          for RtoMatch in range (MaximumR):
+          for RtoMatch in range (MaximumR + 1):
             if RtoMatch > 0 and (ReferenceFrequency / RtoMatch) >= MinimumPFDFrequency and (ReferenceFrequency / RtoMatch) <= MaximumPFDFrequency: # do not divide by zero or exceed PFD limits under fractional mode
               IntTemp = (DesiredFrequency / (ReferenceFrequency / RtoMatch))
               IntTemp = math.floor(IntTemp)
               if IntTemp >= MinimumInt and IntTemp <= MaximumInt:
                 MatchAttempted = True
                 FrequencyRemainder = (DesiredFrequency - (IntTemp * (ReferenceFrequency / RtoMatch)))
-                for ModToMatch in range (MaximumMod):
+                for ModToMatch in range (MaximumMod + 1):
                   if ModToMatch >= 2: # minimum MOD is 2 as per datasheet
                     OldFrequencyError = FrequencyError
                     ModFrequencyStep = (ReferenceFrequency / RtoMatch / ModToMatch)
-                    FracToMatch = (FrequencyRemainder / ModFrequencyStep) + 0.5
-                    FracToMatch = math.floor(FracToMatch)
-                    if FracToMatch == ModToMatch:
-                      FracToMatch -= 1
+                    FracToMatch = (FrequencyRemainder / ModFrequencyStep)
+                    if ((FracToMatch - int(FracToMatch)) >= 0.5):
+                      FracToMatch = math.ceil(FracToMatch)
+                    else:
+                      FracToMatch = math.floor(FracToMatch)
+                    if FracToMatch >= ModToMatch:
+                      FracToMatch = (ModToMatch - 1)
                     FrequencyError = (FrequencyRemainder - (ModFrequencyStep * FracToMatch))
                     if FrequencyError < 0: # convert to a positive if necessary
                       FrequencyError *= (-1)

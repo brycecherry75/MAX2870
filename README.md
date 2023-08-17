@@ -13,6 +13,8 @@ v1.1.2 Add setPowerLevel function which can be used for frequency bursts
 
 v1.1.3 Added direct entry of frequency parameters for precalculated frequencies of the highest possible precision
 
+v1.1.4 Added configuration of charge pump current and phase detector polarity
+
 ## Introduction
 
 This library supports the MAX2870 from Maxim on Arduinos. The chip is a wideband (23.475 MHz to 6 GHz) Phase-Locked Loop (PLL) and Voltage Controlled Oscillator (VCO), covering a very wide range frequency range
@@ -73,6 +75,10 @@ WriteSweepRegs(*regs): high speed write for registers when used for frequency sw
 ReadSweepRegs(*regs): high speed read for registers when used for frequency sweep (*regs is uint32_t and size is as per MAX2870_RegsToWrite
 
 ReadCurrentFreq(*freq): calculation of currently programmed frequency (*freq is uint8_t and size is as per MAX2870_ReadCurrentFrequency_ArraySize)
+
+setCPcurrent(Current): set charge pump current in mA floating
+
+setPDpolarity(INVERTING/NONINVERTING): set phase detector polarity for your VCO loop filter
 
 A Python script (MAX2870pf.py) can be used for calculating the required values for setfDirect for speed.
 
@@ -152,6 +158,9 @@ MAX2870_ERROR_PFD_AND_STEP_FREQUENCY_HAS_REMAINDER
 
 MAX2870_ERROR_PFD_LIMITS
 
+setPDpolarity:
+
+MAX2870_ERROR_POLARITY_INVALID
 
 Warning codes:
 

@@ -11,6 +11,8 @@
   STEP frequency_in_Hz - set channel step
   STATUS - view status of VFO
   CE (ON/OFF) - enable/disable MAX2870
+  CP_CURRENT current_in_mA_floating - adjust charge pump current to suit your loop filter (default library value is 2.56 mA)
+  PD_POLARITY (INVERTING/NONINVERTING) - change phase detector polarity (default library is noninverting for passive/noninverting loop filters)
 
 */
 
@@ -552,6 +554,23 @@ void loop() {
         }
         else if (strcmp(field, "OFF") == 0) {
           digitalWrite(CEpin, LOW);
+        }
+        else {
+          ValidField = false;
+        }
+      }
+      else if (strcmp(field, "CP_CURRENT") == 0) {
+        getField(field, 1);
+        float ChargePumpCurrent = atof(field);
+        vfo.setCPcurrent(ChargePumpCurrent);
+      }
+      else if (strcmp(field, "PD_POLARITY") == 0) {
+        getField(field, 1);
+        if (strcmp(field, "INVERTING") == 0) {
+          vfo.setPDpolarity(MAX2870_LOOP_TYPE_INVERTING);
+        }
+        else if (strcmp(field, "NONINVERTING") == 0) {
+          vfo.setPDpolarity(MAX2870_LOOP_TYPE_NONINVERTING);
         }
         else {
           ValidField = false;

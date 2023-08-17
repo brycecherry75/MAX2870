@@ -26,6 +26,8 @@
 #define MAX2870_REF_UNDIVIDED 0
 #define MAX2870_REF_HALF 1
 #define MAX2870_REF_DOUBLE 2
+#define MAX2870_LOOP_TYPE_INVERTING 0
+#define MAX2870_LOOP_TYPE_NONINVERTING 1
 
 // common to all of the following subroutines
 #define MAX2870_ERROR_NONE 0
@@ -57,6 +59,9 @@
 // setf and setrf
 #define MAX2870_ERROR_PFD_AND_STEP_FREQUENCY_HAS_REMAINDER 19
 #define MAX2870_ERROR_PFD_LIMITS 20
+
+// setPDpolarity
+#define MAX2870_ERROR_POLARITY_INVALID 21
 
 #define MAX2870_RegsToWrite 6UL // for high speed sweep
 
@@ -124,6 +129,8 @@ class MAX2870
     void WriteSweepValues(const uint32_t *regs);
     void ReadSweepValues(uint32_t *regs);
     void ReadCurrentFrequency(char *freq);
+    int setCPcurrent(float Current);
+    int setPDpolarity(uint8_t PDpolarity);
 
     SPISettings MAX2870_SPI;
 

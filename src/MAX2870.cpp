@@ -614,3 +614,29 @@ int MAX2870::setAuxPowerLevel(uint8_t PowerLevel) {
   WriteRegs();
   return MAX2870_ERROR_NONE;
 }
+
+int MAX2870::setCPcurrent(float Current) {
+  if (Current < 0.32) {
+    Current = 0.32;
+  }
+  if (Current > 5.12) {
+    Current = 5.12;
+  }
+  Current /= 0.32;
+  Current -= 0.5; // 0 = 0.32 mA per step rounded
+  uint8_t CPcurrent = Current;
+  MAX2870_R[0x02] = BitFieldManipulation.WriteBF_dword(9, 4, MAX2870_R[0x02], CPcurrent);
+  WriteRegs();
+  return MAX2870_ERROR_NONE;
+}
+
+int MAX2870::setPDpolarity(uint8_t PDpolarity) {
+  if (PDpolarity == MAX2870_LOOP_TYPE_INVERTING || PDpolarity == MAX2870_LOOP_TYPE_NONINVERTING) {
+    MAX2870_R[0x02] = BitFieldManipulation.WriteBF_dword(6, 1, MAX2870_R[0x02], PDpolarity);
+    WriteRegs();
+    return MAX2870_ERROR_NONE;
+  }
+  else {
+    return MAX2870_ERROR_POLARITY_INVALID;
+  }
+}
